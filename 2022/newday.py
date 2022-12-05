@@ -9,7 +9,7 @@ newpath = f"./day{daynum}"
 os.mkdir(newpath)
 
 open(f"{newpath}/solve.py", "x").write(
-    "data = []\n\nfile = open('input.txt', 'r')\n\nfor line in file.readlines():\n\tdata.append(line)"
+    "data = []\n\nfor line in open('input.txt', 'r').readlines():\n\tdata.append(line)"
 )
 
 cookie = open(f"./session.env", "r").readlines()[0]
