@@ -5,6 +5,7 @@ data = []
 stacks = []
 
 for i, line in enumerate(open('input.txt', 'r').readlines()):
+	
 	if line.strip(" ")[0] == "[":
 		linecrates = []
 		for i in range(0, len(line), 4):
@@ -18,7 +19,7 @@ for i, line in enumerate(open('input.txt', 'r').readlines()):
 	if line[0] == "m":
 		spl = line.split(" ")
 		data.append([int(spl[1]), int(spl[3]), int(spl[5])])
-
+print(stacks)
 stacks2 = deepcopy(stacks)
 def move( frm: int, to: int):
 	stacks[to-1].insert(0, stacks[frm -1].pop(0))
