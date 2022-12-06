@@ -2,25 +2,23 @@ from copy import deepcopy
 data = []
 
 
-stacks = []
+stacks = None
 
 for i, line in enumerate(open('input.txt', 'r').readlines()):
-	
+	# init stacks
+	if stacks == None: stacks = [[] for _ in range(len(line)//4)]
+
 	if line.strip(" ")[0] == "[":
-		linecrates = []
-		for i in range(0, len(line), 4):
-			linecrates.append((line[i] + line[i+1] + line[i+2]).strip(" []"))
+		linecrates = [x for y, x in enumerate(line) if y % 4 == 1]
 		for i, elem in enumerate(linecrates):
-			if elem != "":
-				if (len(stacks) -1) != i:
-					for _ in range(i-len(stacks)+1):
-						stacks.append([])
-				stacks[i].append(elem)
+			if elem != " ": stacks[i].append(elem)
+
 	if line[0] == "m":
 		spl = line.split(" ")
 		data.append([int(spl[1]), int(spl[3]), int(spl[5])])
-print(stacks)
+
 stacks2 = deepcopy(stacks)
+
 def move( frm: int, to: int):
 	stacks[to-1].insert(0, stacks[frm -1].pop(0))
 
