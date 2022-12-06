@@ -7,7 +7,7 @@ for i, line in enumerate(open('input.txt', 'r').readlines()):
 	# init stacks
 	if stacks == None: stacks = [[] for _ in range(len(line)//4)]
 
-	if line.strip(" ")[0] == "[":
+	if line[0] == "[":
 		linecrates = [x for y, x in enumerate(line) if y % 4 == 1]
 		for i, elem in enumerate(linecrates):
 			if elem != " ": stacks[i].append(elem)
