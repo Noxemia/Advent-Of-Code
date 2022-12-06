@@ -1,7 +1,6 @@
 from copy import deepcopy
 data = []
 
-
 stacks = None
 
 for i, line in enumerate(open('input.txt', 'r').readlines()):
