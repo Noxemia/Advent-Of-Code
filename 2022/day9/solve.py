@@ -42,8 +42,8 @@ def movedown():
 	var.taily[0] = var.taily[0] - 1
 
 def updatetail():
-	ran = len(var.tailx)
-	for i in range(1,ran):
+	taillen = len(var.tailx)
+	for i in range(1,taillen):
 		if not touching(var.tailx[i-1],var.taily[i-1],var.tailx[i],var.taily[i]):
 			# same col move
 			if var.tailx[i-1] == var.tailx[i]:
@@ -61,7 +61,7 @@ def updatetail():
 				if var.tailx[i-1] < var.tailx[i]: var.tailx[i] -= 1
 		else:
 			break
-	coords = [var.tailx[ran-1], var.taily[ran-1]]
+	coords = [var.tailx[taillen-1], var.taily[taillen-1]]
 	if not coords in scorecoords:
 		scorecoords.append(coords)
 
