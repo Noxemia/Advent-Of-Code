@@ -5,19 +5,10 @@ for line in open('input.txt', 'r').readlines():
 	spl = line.split(" ")
 	data.append([spl[0], int(spl[1])])
 
-
-
-# init, start 0,0
-
 @dataclass
 class vars:
-	coordsx: list
-	coordsy: list
-
-var = vars([0]*2,[0]*2)
-
-
-scorecoords = [[0,0]]
+	tailx: list
+	taily: list
 
 def touching(x1,y1, x2,y2) -> bool:
 	#tail is one above
@@ -38,65 +29,66 @@ def touching(x1,y1, x2,y2) -> bool:
 	return False
 
 
-def moveright(index) -> None:
-	oldx:int = var.coordsx[index]
-	oldy:int = var.coordsy[index]
-	var.coordsx[index] = var.coordsx[index] + 1
-	if not touching(var.coordsx[index],var.coordsy[index],var.coordsx[index+1],var.coordsy[index+1]):
-		var.coordsx[index+1] = oldx
-		var.coordsy[index+1] = oldy
-		if [var.coordsx[index+1], var.coordsy[index+1]] not in scorecoords and index == 9:
-			scorecoords.append([var.coordsx[index+1], var.coordsy[index+1]])
+def moveright():
+	var.tailx[0] = var.tailx[0] + 1
 
-def moveleft(index):
-	oldx:int = var.coordsx[index]
-	oldy:int = var.coordsy[index]
-	var.coordsx[index] = var.coordsx[index] - 1
-	if not touching(var.coordsx[index],var.coordsy[index],var.coordsx[index+1],var.coordsy[index+1]):
-		var.coordsx[index+1] = oldx
-		var.coordsy[index+1] = oldy
-		if [var.coordsx[index+1], var.coordsy[index+1]] not in scorecoords and index == 9:
-			scorecoords.append([var.coordsx[index+1], var.coordsy[index+1]])
+def moveleft():
+	var.tailx[0] = var.tailx[0] - 1
 
-def moveup(index):
-	oldx:int = var.coordsx[index]
-	oldy:int = var.coordsy[index]
-	var.coordsy[index] = var.coordsy[index] + 1
-	if not touching(var.coordsx[index],var.coordsy[index],var.coordsx[index+1],var.coordsy[index+1]):
-		var.coordsx[index+1] = oldx
-		var.coordsy[index+1] = oldy
-		if [var.coordsx[index+1], var.coordsy[index+1]] not in scorecoords and index == 9:
-			scorecoords.append([var.coordsx[index+1], var.coordsy[index+1]])
+def moveup():
+	var.taily[0] = var.taily[0] + 1
 
-def movedown(index):
-	oldx:int = var.coordsx[index]
-	oldy:int = var.coordsy[index]
-	var.coordsx[index] = var.coordsx[index] - 1
-	if not touching(var.coordsx[index],var.coordsy[index],var.coordsx[index+1],var.coordsy[index+1]):
-		var.coordsx[index+1] = oldx
-		var.coordsy[index+1] = oldy
-		if [var.coordsx[index+1], var.coordsy[index+1]] not in scorecoords and index == 9:
-			scorecoords.append([var.coordsx[index+1], var.coordsy[index+1]])
+def movedown():
+	var.taily[0] = var.taily[0] - 1
+
+def updatetail():
+	ran = len(var.tailx)
+	for i in range(1,ran):
+		if not touching(var.tailx[i-1],var.taily[i-1],var.tailx[i],var.taily[i]):
+			# same col move
+			if var.tailx[i-1] == var.tailx[i]:
+				if var.taily[i-1] > var.taily[i]: var.taily[i] += 1
+				if var.taily[i-1] < var.taily[i]: var.taily[i] -= 1
+			# same row move
+			elif var.taily[i-1] == var.taily[i]:
+				if var.tailx[i-1] > var.tailx[i]: var.tailx[i] += 1
+				if var.tailx[i-1] < var.tailx[i]: var.tailx[i] -= 1
+			#diag move
+			else:
+				if var.taily[i-1] > var.taily[i]: var.taily[i] += 1
+				if var.taily[i-1] < var.taily[i]: var.taily[i] -= 1
+				if var.tailx[i-1] > var.tailx[i]: var.tailx[i] += 1
+				if var.tailx[i-1] < var.tailx[i]: var.tailx[i] -= 1
+		else:
+			break
+	coords = [var.tailx[ran-1], var.taily[ran-1]]
+	if not coords in scorecoords:
+		scorecoords.append(coords)
 
 
 
-
-
-
-
-for ins in data:
-	if ins[0] == "R":
-		for _ in range(ins[1]):
-			moveright()
-	if ins[0] == "L":
-		for _ in range(ins[1]):
-			moveleft()
-	if ins[0] == "U":
-		for _ in range(ins[1]):
-			moveup()
-	if ins[0] == "D":
-		for _ in range(ins[1]):
-			movedown()
-	#print(var.headx, var.heady, var.tailx, var.taily)
-
-print(len(scorecoords))
+def calc(taillengt: int):
+	global var 
+	global scorecoords
+	var = vars([0]*taillengt, [0]*taillengt)
+	scorecoords = [[0,0]]
+	for ins in data:
+		if ins[0] == "R":
+			for _ in range(ins[1]):
+				moveright()
+				updatetail()
+		if ins[0] == "L":
+			for _ in range(ins[1]):
+				moveleft()
+				updatetail()
+		if ins[0] == "U":
+			for _ in range(ins[1]):
+				moveup()
+				updatetail()
+		if ins[0] == "D":
+			for _ in range(ins[1]):
+				movedown()
+				updatetail()
+	print(len(scorecoords))
+calc(2)
+calc(10)
