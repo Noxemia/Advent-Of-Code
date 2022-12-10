@@ -72,7 +72,10 @@ while True:
 		delay = True
 
 for line in screen:
-	print(line)
+	for i in range(len(line)):
+		if (i+1) % 5 == 0:
+			line[i] = "\t"
+	print("".join(line))
 
 
 
