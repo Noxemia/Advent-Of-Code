@@ -46,7 +46,7 @@ ci = 0
 delayadd = 0
 delay = False
 screenmods = [40, 80, 120, 160, 200, 240]
-drawcnt = 0
+
 while True:
 	cycle += 1
 	if cycle in screenmods:
@@ -54,15 +54,16 @@ while True:
 		crtrow = ["."]*40
 	if cycle == 240: break
 	pixelindex = (cycle-1) % 40
-	if pixelindex in [register-1, register, register+1]:
-		drawcnt += 1
-		crtrow[pixelindex] = "#"
+
+	if pixelindex in [register-1, register, register+1]: crtrow[pixelindex] = "#"
+
 	if delay:
 		register += delayadd
 		delay = False
 		ci += 1
 		command = data[ci]
 		continue
+
 	if command[0][0] == "n":
 		ci += 1
 		command = data[ci]
