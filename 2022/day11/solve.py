@@ -65,22 +65,18 @@ def round(p1: bool):
 		inspects(monkey, p1)
 	minimizeworry()
 
-def sorting(monkey: Monkey):
-	return monkey.inspectcount
-
-
 def p1():
 	global monkeys
 	ogmonkeys = deepcopy(monkeys)
 	for _ in range(20): round(True)
-	monkeys = sorted(monkeys, key=sorting, reverse=True)
+	monkeys = sorted(monkeys, key=lambda mon: mon.inspectcount, reverse=True)
 	print(f"Part 1: {monkeys[0].inspectcount * monkeys[1].inspectcount}")
 	monkeys = ogmonkeys
 
 def p2():
 	global monkeys
 	for _ in range(10000): round(False)
-	monkeys = sorted(monkeys, key=sorting, reverse=True)
+	monkeys = sorted(monkeys, key=lambda mon: mon.inspectcount, reverse=True)
 	print(f"Part 2: {monkeys[0].inspectcount * monkeys[1].inspectcount}")
 p1()
 p2()
