@@ -35,15 +35,39 @@ def sortCards(c1, c2):
         return -1
     return 1
 
-def parseType(hand: Hand, accountForJoker: bool = False):
+# p1
+def parseType(hand: Hand):
+    count = Counter(hand.cards)
+    countValues = [x[1] for x in count.most_common(2)]
+    
+    if countValues[0] == 5:
+        hand.type = Type.FiveKind
+        return
+    if countValues[0] == 4:
+        hand.type = Type.FourKind
+        return
+    if countValues[0] == 3:
+        if countValues[1] == 2:
+            hand.type = Type.FullHouse
+        else:
+            hand.type = Type.ThreeKind
+        return
+    if countValues[0] == 2:
+        if countValues[1] == 2:
+            hand.type = Type.TwoPair
+        else:
+            hand.type = Type.OnePair
+        return
+    hand.type = Type.HighCard
+
+
+# p2
+def parseType2(hand: Hand):
     if hand.cards == "JJJJJ":
         hand.type = Type.FiveKind
         return
     count = Counter([x for x in hand.cards if x != "J"])
     numberOfJs = Counter(hand.cards)["J"] if "J" in hand.cards else 0
-    if not accountForJoker: 
-        count = Counter(hand.cards)
-        numberOfJs = 0
     countValues = list([x[1] for x in count.most_common(2)])
     ## In natural 5s
     if countValues[0] == 5:
@@ -94,6 +118,8 @@ def handSort(hand1: Hand, hand2: Hand) -> int:
 
 #### part 1 
         
+data2 = copy(data)
+
 hands1: List[Hand] = []
 for hand in data:
     parseType(hand)
@@ -107,8 +133,8 @@ for idx, hand in enumerate(hands1):
 ## part 2
 hands2: List[Hand] = []
 
-for hand in data:
-    parseType(hand, True)
+for hand in data2:
+    parseType2(hand)
     hands2.append(hand)
 
 p2sum = 0
