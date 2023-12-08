@@ -1,7 +1,6 @@
 from dataclasses import dataclass
-from typing import List
-
-
+from typing import List, Set
+from math import lcm
 
 @dataclass
 class Node():
@@ -9,8 +8,9 @@ class Node():
 	left: str
 	right: str
 
-data: List[Node] = []
-instructions = []
+data: Set[Node] = {}
+instructions: List[str] = []
+startingNodes: List[Node] = []
 
 for line in open('input.txt', 'r').readlines():
 	if instructions == []:
@@ -22,31 +22,34 @@ for line in open('input.txt', 'r').readlines():
 	lr = line.split("=")[1].strip()[1:-1]
 	left = lr.split(",")[0]
 	right = lr.split(",")[1].strip()
-	
-	data.append(Node(label, left, right))
+	newNode = Node(label, left, right)
+	data[label] = (newNode)
+	if label[-1] == "A":
+		startingNodes.append(newNode)
 
 
-def getNode(label: str):
-	for node in data:
-		if node.label == label:
-			return node
-	print("Error didnt find")
+def getNode(label: str) -> Node:
+	return data[label]
 
-p1count = 0
+def findForNode(node: Node) -> int:
+    global instructions
+    cnode = node
+    stepCount = 0
+    lInstructions = [*instructions]
+    while True:
+        stepCount += 1
+        instr = lInstructions.pop(0)
+        lInstructions.append(instr)
+        if instr == "R":
+            cnode = getNode(cnode.right)
+        elif instr == "L":
+            cnode = getNode(cnode.left)
+        else: print("Error unknown node")
+        if cnode.label[-1] == "Z":
+            return stepCount
+		
+res = []
+for node in startingNodes:
+	res.append(findForNode(node))
 
-cnode = getNode("AAA")
-while True:
-	p1count += 1
-	instr = instructions.pop(0)
-	instructions.append(instr)
-	print(instr)
-	if instr == "R":
-		cnode = getNode(cnode.right)
-	elif instr == "L":
-		cnode = getNode(cnode.left)
-	else: print("Error unknown node")
-
-	print("New Node", cnode)
-	if cnode.label == "ZZZ":
-		print("Got end in", p1count)
-		break
+print("P1:", res[0], "P2:", lcm(*res))
