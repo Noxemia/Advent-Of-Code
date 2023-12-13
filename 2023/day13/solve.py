@@ -18,65 +18,63 @@ for map in data:
 	print("--------------")
 
 
-def findVertical(map):
-	leftindexs = []
-	for i in range(0, len(map[0])-1):
-		columnLeft = [line[i] for line in map]
-		columnRight = [line[i+1] for line in map]
-		
-		if columnLeft == columnRight:
-			leftindexs.append(i)
-	if len(leftindexs) == 0: return 0
-	leftIndex = int((sum(leftindexs) / len(leftindexs)) -1)
-	rightIndex = leftIndex +3 
-	while leftIndex >= 0 and rightIndex <=len(map[0])-1:
-		leftline = [line[leftIndex] for line in map]
-		rightline = [line[rightIndex] for line in map]
-		#print("LL", leftline)
-		#print("RL", rightline)
-		if  leftline != rightline:
-			#print("False vert")
-			return 0
-		leftIndex -= 1
-		rightIndex += 1
-	#print("True vert")
-	return i+1
+def findVerticalMatches(map):
+	res = []
+	for idx in range(len(map[0])-1):
+		leftline = [line[idx] for line in map]
+		rightline = [line[idx+1] for line in map]
+		if leftline == rightline:
+			res.append(idx)
+	return res
 
-
-def findHorizontal(map):
-	topindexs = []
-	for i in range(len(map)-1):
-		rowTop = map[i]
-		rowBot = map[i+1]
-		
-		if rowTop == rowBot:
-			topindexs.append(i)
-			print(i)
-	if len(topindexs) == 0: return 0
-	topIndex = int((sum(topindexs) / len(topindexs))-1)
-	botIndex = topIndex	+ 3	
+def findHorziontalMatches(map):
+	res = []
+	for idx in range(len(map)-1):
+		topline = map[idx]
+		botline = map[idx+1]
+		if topline == botline:
+			res.append(idx)
+	return res
 	
-	while topIndex >= 0 and botIndex <= len(map)-1:
-		topline = map[topIndex]
-		botline = map[botIndex]
-		#print("TL", topline)
-		#print("BL", botline)
-		if topline != botline:
-			#print("False hori")
+def isMirroredVertical(map, _leftIndex):
+	leftindex = _leftIndex -1
+	rightindex = _leftIndex+2
+
+	while leftindex >= 0 and rightindex <= len(map[0]) -1:
+		leftline = [line[leftindex] for line in map]
+		rightline = [line[rightindex] for line in map]
+		if leftline != rightline:
 			return 0
-		topIndex -= 1
-		botIndex += 1
-	return (i+1)*100
-		
+		leftindex -= 1
+		rightindex += 1
+	return _leftIndex+1
+
+def isMirroredHorizontal(map, _topIndex):
+	topindex = _topIndex-1
+	botindex = _topIndex + 2
+	#print(topindex, botindex)
+
+	while topindex >= 0 and botindex <= (len(map) -1):
+		print(topindex, botindex)
+		topline = map[topindex]
+		botline = map[botindex]
+		if topline != botline:
+			return 0
+		topindex -= 1
+		botindex += 1
+
+	return _topIndex+1
+	
 p1sum = 0
 for map in data:
-	vs = findVertical(map)
-	hs = findHorizontal(map)
-	if vs == 0 and hs == 0:
-		for line in map:
-			print(line)
-		print("BADD")
-	p1sum += vs+hs
+	vm = findVerticalMatches(map)
+	hm = findHorziontalMatches(map)
+	print(vm, hm)
+	for m in vm:
+		p1sum += isMirroredVertical(map, m)
+	
+	for m in hm:
+		p1sum += isMirroredHorizontal(map, m) * 100
 	
 
 print(p1sum)
