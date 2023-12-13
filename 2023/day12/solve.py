@@ -1,22 +1,35 @@
 from typing import Tuple, List
-from copy import deepcopy
-from functools import lru_cache
+from functools import cache
 
-data:List[Tuple[str, List[int]]] = []
+datap1: List[Tuple[str, List[int]]] = []
+datap2: List[Tuple[str, List[int]]] = []
 
 for line in open('input.txt', 'r').readlines():
-	line = line.strip("\n")
-	data.append((line.split(" ")[0], list(map(int, line.split(" ")[1].split(",")))))
+    line = line.strip("\n")
+    justSprings = line.split(" ")[0]
+    numbers = list(map(int, line.split(" ")[1].split(",")))
+    expandedLine = ""
+    expandedNumbers = numbers*5
+    for _ in range(5):
+        expandedLine += justSprings + "?"
+    expandedLine = expandedLine[:-1]
+    datap1.append((justSprings, numbers))
+    datap2.append((expandedLine, expandedNumbers))
 
-def groupsToStr(input):
+
+def groupsToStr(input) -> str:
     return "".join([str(x)+"," for x in list(input)])[:-1]
 
-def strToGroup(input: str):
+def strToGroup(input: str) -> List[int]:
     return [int(x) for x in input.split(",")]
 
-def consume(line: str, groups: list[int], groupstr: str) -> int:
+consumeaccess = 0
 
-    sgroup = strToGroup(groupstr)
+@cache
+def consume(line: str, groups: str) -> int:
+    global consumeaccess
+    consumeaccess += 1
+    groups = strToGroup(groups)
     group = groups.pop(0)
 
     ## if line is less chars than the group length, always return []
@@ -26,6 +39,7 @@ def consume(line: str, groups: list[int], groupstr: str) -> int:
 
     ## Loop with window over string
     ## return back a string that is from the last . or eol
+    ## if we go past a # and we have not used it, its not valid
     hashtagseen = False
     firstHastagIndex = 0
     for i in range(0,len(line)-group+1):
@@ -64,17 +78,22 @@ def consume(line: str, groups: list[int], groupstr: str) -> int:
     ## Else we recursivly call consume for each in next
     res = 0
     for _line in next:
-        ret = consume(deepcopy(_line), deepcopy(groups), groupsToStr(groups))
+        ret = consume(_line, groupsToStr(groups))
         res += ret
     return res
 
 
-#exit(0)
 p1tot = 0
-for (line, groups) in data:
-    ret = consume(line, groups, groupsToStr(groups))
+for (line, groups) in datap1:
+    ret = consume(line, groupsToStr(groups))
     seen = []
     p1tot += ret
 
+p2tot = 0
+for (line, groups) in datap2:
+    ret = consume(line, groupsToStr(groups))
+    seen = []
+    p2tot += ret
 
-print(p1tot)
+
+print(p1tot, p2tot)
