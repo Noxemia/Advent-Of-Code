@@ -1,5 +1,3 @@
-from copy import deepcopy
-
 data = []
 
 tmp = []
@@ -48,7 +46,7 @@ def isMirroredHorizontal(map, _topIndex):
 	topindex = _topIndex-1
 	botindex = _topIndex + 2
 
-	while topindex >= 0 and botindex <= (len(map) -1):
+	while topindex >= 0 and botindex <= len(map) -1:
 		topline = map[topindex]
 		botline = map[botindex]
 		if topline != botline:
@@ -107,19 +105,19 @@ def swap(c):
 def checkMap(map, mapid):
 	for idy, line in enumerate(map):
 		for idx, c in enumerate(line):
-			mapcopy = deepcopy(map)
-			mapcopy[idy][idx] = swap(c)
+			map[idy][idx] = swap(c)
 
-			vm = findVerticalMatches2(mapcopy, mapid)
-			hm = findHorziontalMatches2(mapcopy, mapid)
+			vm = findVerticalMatches2(map, mapid)
+			hm = findHorziontalMatches2(map, mapid)
 			res = 0
 
 			for m in vm:
-				res += isMirroredVertical(mapcopy, m)
+				res += isMirroredVertical(map, m)
 			for m in hm:
-				res += isMirroredHorizontal(mapcopy, m) * 100
+				res += isMirroredHorizontal(map, m) * 100
 			if res != 0:
 				return res
+			map[idy][idx] = swap(map[idy][idx])
 	return 0 
 
 p2sum = 0

@@ -4,7 +4,6 @@ from requests import get
 
 daynum = str(date.today())[-2:]
 if daynum[0] == '0': daynum = daynum[1:2]
-daynum = 11
 newpath = f"./day{daynum}"
 
 os.mkdir(newpath)
