@@ -8,12 +8,17 @@ for line in open('input.txt', 'r').readlines():
 	line = line.strip("\n")
 	data.append((line.split(" ")[0], list(map(int, line.split(" ")[1].split(",")))))
 
-ec = ["?", "."] #end chars
-@lru_cache
-def consume(line: str, groups: list[int]) -> int:
-    global ec
+def groupsToStr(input):
+    return "".join([str(x)+"," for x in list(input)])[:-1]
+
+def strToGroup(input: str):
+    return [int(x) for x in input.split(",")]
+
+def consume(line: str, groups: list[int], groupstr: str) -> int:
+
+    sgroup = strToGroup(groupstr)
     group = groups.pop(0)
-    
+
     ## if line is less chars than the group length, always return []
     if len(line) < group: return 0
 
@@ -59,7 +64,7 @@ def consume(line: str, groups: list[int]) -> int:
     ## Else we recursivly call consume for each in next
     res = 0
     for _line in next:
-        ret = consume(deepcopy(_line), deepcopy(groups))
+        ret = consume(deepcopy(_line), deepcopy(groups), groupsToStr(groups))
         res += ret
     return res
 
@@ -67,7 +72,7 @@ def consume(line: str, groups: list[int]) -> int:
 #exit(0)
 p1tot = 0
 for (line, groups) in data:
-    ret = consume(line, groups)
+    ret = consume(line, groups, groupsToStr(groups))
     seen = []
     p1tot += ret
 
