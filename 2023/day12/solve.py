@@ -1,5 +1,6 @@
 from typing import Tuple, List
 from copy import deepcopy
+from functools import lru_cache
 
 data:List[Tuple[str, List[int]]] = []
 
@@ -8,9 +9,11 @@ for line in open('input.txt', 'r').readlines():
 	data.append((line.split(" ")[0], list(map(int, line.split(" ")[1].split(",")))))
 
 ec = ["?", "."] #end chars
+@lru_cache
 def consume(line: str, groups: list[int]) -> int:
     global ec
     group = groups.pop(0)
+    
     ## if line is less chars than the group length, always return []
     if len(line) < group: return 0
 
