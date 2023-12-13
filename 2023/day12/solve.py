@@ -7,19 +7,15 @@ for line in open('input.txt', 'r').readlines():
 	line = line.strip("\n")
 	data.append((line.split(" ")[0], list(map(int, line.split(" ")[1].split(",")))))
 
-
 ec = ["?", "."] #end chars
-consumecalls = 0
-def consume(line: str, groups: str) -> int:
-    global ec, consumecalls
-    consumecalls +=1
-    groups: list[int] = [int(x) for x in groups]
+def consume(line: str, groups: list[int]) -> int:
+    global ec
     group = groups.pop(0)
-    #print("GROUPS:", groups)
     ## if line is less chars than the group length, always return []
     if len(line) < group: return 0
 
     next: List[str] = []
+
     ## Loop with window over string
     ## return back a string that is from the last . or eol
     hashtagseen = False
@@ -36,6 +32,7 @@ def consume(line: str, groups: str) -> int:
         
         # no dots in window
         if any([x == "." for x in window]): continue
+
         # check that to the right is either a dot or a questionmark
         leftchar = "." if i == 0 else line[i-1]
         rightchar = "." if i+group == len(line) else line[i+group]
@@ -43,23 +40,23 @@ def consume(line: str, groups: str) -> int:
         _next = line[i+group+1:]
         next.append(_next)
 
+
     ## if we have no next groups but groups is not empty we return 0
     if len(next) == 0: 
         return 0
+    
     ## if we have used all groups, we just return the number groups that do not contains any #
     if len(groups) == 0:
         res = 0
         for _group in next:
             if "#" not in _group: 
                 res += 1
-                #print(_group)
         return res
-    ## Else we recursivly call consume for each in next
     
+    ## Else we recursivly call consume for each in next
     res = 0
     for _line in next:
-        ret = consume(deepcopy(_line), deepcopy("".join([str(x) for x in groups])))
-        #print(ret)
+        ret = consume(deepcopy(_line), deepcopy(groups))
         res += ret
     return res
 
@@ -69,8 +66,7 @@ p1tot = 0
 for (line, groups) in data:
     ret = consume(line, groups)
     seen = []
-    #print(ret)
     p1tot += ret
 
-print(consumecalls)
+
 print(p1tot)
