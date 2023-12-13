@@ -10,9 +10,10 @@ for line in open('input.txt', 'r').readlines():
 
 ec = ["?", "."] #end chars
 consumecalls = 0
-def consume(line: str, groups: list[int]) -> int:
+def consume(line: str, groups: str) -> int:
     global ec, consumecalls
     consumecalls +=1
+    groups: list[int] = [int(x) for x in groups]
     group = groups.pop(0)
     #print("GROUPS:", groups)
     ## if line is less chars than the group length, always return []
@@ -57,7 +58,7 @@ def consume(line: str, groups: list[int]) -> int:
     
     res = 0
     for _line in next:
-        ret = consume(deepcopy(_line), deepcopy(groups))
+        ret = consume(deepcopy(_line), deepcopy("".join([str(x) for x in groups])))
         #print(ret)
         res += ret
     return res
