@@ -86,14 +86,10 @@ def consume(line: str, groups: str) -> int:
 p1tot = 0
 for (line, groups) in datap1:
     ret = consume(line, groupsToStr(groups))
-    seen = []
     p1tot += ret
 
 p2tot = 0
 for (line, groups) in datap2:
-    ret = consume(line, groupsToStr(groups))
-    seen = []
-    p2tot += ret
+    p2tot += consume(line, groupsToStr(groups))
 
-
-print(p1tot, p2tot)
+print("Part 1:", p1tot, "Part 2:", p2tot)
