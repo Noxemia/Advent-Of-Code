@@ -90,9 +90,9 @@ def stringifyData():
 	return res
 
 cache = {}
-cache[stringifyData()] = 1
 count = 0
 firstocc = 0
+
 while True:
 	if count > 10000: break
 	count += 1 
@@ -101,10 +101,10 @@ while True:
 	if string in cache:
 		firstocc = cache[string]
 		break
-		
 	else:
 		cache[string] = count
 
+print(count)
 diff = count - firstocc
 p2cycles = 1_000_000_000 - firstocc
 remaining = p2cycles % diff
