@@ -2,99 +2,91 @@ from typing import List, Tuple
 from enum import Enum
 from dataclasses import dataclass
 from copy import deepcopy
+from heapq import heappop, heappush
 
 class Dir(Enum):
 	R = ">"
 	L = "<"
 	U = "^"
 	D = "v"
+	S = "s"
 
 @dataclass
 class Instr():
 	idx: int
 	idy: int
 	cost: int
-	td: int #totaldistance
-	md: int #manhattan distance to end
-	ld: List[Dir] # 3 lasts directions
-	visited: List[Tuple[int, int]] # hold visited with (x,y) tuples
+	TotDist: int #totaldistance
+	LastDirs: List[Dir] # 3 lasts directions
 
 data = []
 
 for line in open('input.txt', 'r').readlines():
 	data.append([int(x) for x in list(line.strip())])
 
-for line in data:
-	print(line)
+visited = {}
+Nexts: List[Instr] = []
 
-
-## need to hold x, y, tot, manhattan distance, last dirs
-## held in (x,y,md,ld)
-
-
-def getManhattanDist(x: int, y:int):
-	return ((len(data[0])-1) - x) + ((len(data)-1) - y)
-
-def getCoordsAroundFiltered(x:int,y:int, _visited: List[Tuple[int,int]]) -> List[Tuple[int, int, Dir]]:
+def getCoords(x:int,y:int, disallowedDir: Dir, backTrack: Dir) -> List[Tuple[int, int, Dir]]:
 	res = []
-	if x != 0:
-		if (x-1, y) not in _visited:
-			res.append((x-1, y, Dir.L))
-	if x != len(data[0]) -1:
-		if (x+1, y) not in _visited:
-			res.append((x+1, y, Dir.R))
-	if y != 0:
-		if (x, y-1) not in _visited:
-			res.append((x, y-1, Dir.U))
-	if y != len(data)-1:
-		if (x, y+1) not in _visited:
-			res.append((x, y+1, Dir.D))
+	if x != 0 and disallowedDir != Dir.L and backTrack != Dir.R:
+		res.append((x-1, y, Dir.L))
+	if x != len(data[0]) -1 and disallowedDir != Dir.R and backTrack != Dir.L:
+		res.append((x+1, y, Dir.R))
+	if y != 0 and disallowedDir != Dir.U and backTrack != Dir.D:
+		res.append((x, y-1, Dir.U))
+	if y != len(data)-1 and disallowedDir != Dir.D and backTrack != Dir.U:
+		res.append((x, y+1, Dir.D))
 	return res
 
-nexts: List[Instr] = []
 def sortNexts():
-	global nexts
-	nexts = sorted(nexts, key=lambda x: x.md )
+	global Nexts
+	Nexts = sorted(Nexts, key=lambda x: x.TotDist)
 
-solves = [200]
-nexts.append(Instr(0,0,2,0,0,[],[]))
-for _ in range(100000000000):
-	# get next instruction
-	next: Instr = nexts.pop(0)
-	#print("Next instruction:", next)
-	# On last coord
-	if next.idx == (len(data[0])-1) and next.idy == (len(data)-1): 
-		print("DONE", next)
-		solves.append(next.td)
-		continue
-	if next.td > min(solves): continue
-	# check that not 3 in a row
-	if all([node == next.ld[0] for node in next.ld]) and len(next.ld) >= 3: 
-		#print("xd")
-		continue
+#Nexts.append(Instr(0, 0, 0, 0, [Dir.R]))
+Nexts.append(Instr(0, 0, 0, 0, [Dir.S]))
+ans: Instr = None
+while len(Nexts) != 0:
+	instr: Instr = Nexts.pop(0)
+	newDist = instr.TotDist + instr.cost
+	if newDist > 1500: continue
+	## Check that we have not been in the same state before
+	if len(instr.LastDirs) == 3:
+		currentDirection = instr.LastDirs[2]
+		walkLenght = 1
+		if instr.LastDirs[1] == currentDirection:
+			walkLenght += 1
+			if instr.LastDirs[0] == currentDirection:
+				walkLenght += 1
 
-	nextCoords = getCoordsAroundFiltered(next.idx, next.idy, next.visited)
-	#print("NextCoords for", (next.idx, next.idy), "is", nextCoords, "\n")
 
-	newTotal = next.td + next.cost
-	nwvc = deepcopy(next.visited)
-	newVisited = []
-	for x in nwvc: newVisited.append(x)
-	newVisited.append((next.idx, next.idy))
+		if (instr.idx, instr.idy, currentDirection, walkLenght) in visited: continue
+		visited[(instr.idx, instr.idy, currentDirection, walkLenght)] = 0
+
+	## Check if we are done
+	if instr.idx == (len(data[0])-1) and instr.idy == (len(data)-1):
+		print(instr.TotDist+instr.cost)
+		ans = instr
+		break
+
+
+	## Check that we have not gone in the same direction 3 times
+	canNotWalkSameDir = all([node == instr.LastDirs[0] for node in instr.LastDirs]) and len(instr.LastDirs) >= 3 
+	disallowedDir = None
+	if canNotWalkSameDir:
+		disallowedDir = instr.LastDirs[0]
+
+	nextCoords = getCoords(instr.idx, instr.idy, disallowedDir, instr.LastDirs[-1])
+
 	for (idx, idy, _dir) in nextCoords:
-		newManhattan: int = getManhattanDist(idx, idy) + next.td
-		dirCopy = deepcopy(next.ld)
+		dirCopy = deepcopy(instr.LastDirs)
 		newDir = []
 		for x in dirCopy: newDir.append(x)
 		newDir.append(_dir)
-		#print(dirCopy, newDir, next.ld, _dir)
 		if len(newDir) > 3: newDir.pop(0)
-		nexts.append(Instr(idx, idy, data[idy][idx], newTotal, newManhattan, newDir, newVisited ))
-	sortNexts()
-	#print(nexts)
-
 		
+		Nexts.append(Instr(idx, idy, data[idy][idx], newDist, newDir))
+	#print(len(Nexts))
+	sortNexts()
 
-	
-
-	
+print("?")
