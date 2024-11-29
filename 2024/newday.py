@@ -12,8 +12,9 @@ open(f"{newpath}/solve.py", "x").write(
     "data = []\n\nfor line in open('input.txt', 'r').readlines():\n    data.append(line)"
 )
 
+# cookie starts with session= and then the cookie
 cookie = open(f"./session.env", "r").readlines()[0]
 
-input = get(f'https://adventofcode.com/2023/day/{daynum}/input', headers={'cookie': cookie})
+input = get(f'https://adventofcode.com/{date.year}/day/{daynum}/input', headers={'cookie': cookie})
 
 open(f"{newpath}/input.txt", "x").write(input.content.decode('utf-8'))
