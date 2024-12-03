@@ -1,7 +1,6 @@
-data = ""
 
 import re
-
+data = ""
 for line in open('input.txt', 'r').readlines():
     data += line
 
