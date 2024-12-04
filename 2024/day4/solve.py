@@ -9,12 +9,20 @@ for line in open('input.txt', 'r').readlines():
     data.append([x for x in line])
 
 data.insert(0, ["L"*len(data[2])])
-data.append(["L"*len(data[2])])
-
-for line in data:
-    print(line)
+data.insert(0, ["L"*len(data[2])])
 
 count = 0
+
+def checkXmas(ry, rx):
+    global data, count
+    try:
+        st = []
+        for ny, nx in zip(ry, rx):
+            st.append(data[ny][nx])
+        if "".join(st) == "XMAS":
+            count +=1
+    except: pass
+
 for y, row in enumerate(data):
     for x, c in enumerate(row):
         if c != "X": continue
@@ -27,6 +35,7 @@ for y, row in enumerate(data):
             if "".join(st) == "XMAS":
                 count +=1
         except: pass
+        checkXmas()
 
         ### look diag up right
         try:
@@ -92,4 +101,26 @@ for y, row in enumerate(data):
                 count += 1
         except: pass
 
+count2 = 0
+for y, row in enumerate(data):
+    for x, c in enumerate(row):
+        if c != "A": continue
+
+        try:
+            tl = [data[y-1][x-1]]
+            tr = [data[y-1][x+1]]
+            bl = [data[y+1][x-1]]
+            br = [data[y+1][x+1]]
+
+            ld = sorted(tl + br)
+            rd = sorted(tr + bl)
+
+            if ld == ["M", "S"] and rd == ["M", "S"]:
+                count2 +=1
+
+        except:pass
+
+
+
 print(count)
+print(count2)
