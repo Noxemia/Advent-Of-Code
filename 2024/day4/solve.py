@@ -16,33 +16,23 @@ def checkXmas(ry, rx):
 
 for y, row in enumerate(data):
     for x, c in enumerate(row):
-        if c != "X": continue
-        ### look up
-        checkXmas(range(y, y-4, -1), [x]*4)
-        ### look diag up right
-        checkXmas(range(y, y-4, -1), range(x, x+4))
-        ### look right
-        checkXmas([y]*4, range(x, x+4))
-        ### look diag down right
-        checkXmas(range(y, y+4), range(x, x+4))
-        ### look down
-        checkXmas(range(y, y+4), [x]*4)
-        ### look down left
-        checkXmas(range(y, y+4), range(x, x-4, -1))
-        ### look left
-        checkXmas([y]*4, range(x, x-4,-1))
-        ### look up left
-        checkXmas(range(y, y-4, -1), range(x, x-4, -1))
+        if c == "X": 
+            checkXmas(range(y, y-4, -1), [x]*4)             ### look up
+            checkXmas(range(y, y-4, -1), range(x, x+4))     ### look diag up right
+            checkXmas([y]*4, range(x, x+4))                 ### look right
+            checkXmas(range(y, y+4), range(x, x+4))         ### look diag down right
+            checkXmas(range(y, y+4), [x]*4)                 ### look down
+            checkXmas(range(y, y+4), range(x, x-4, -1))     ### look down left
+            checkXmas([y]*4, range(x, x-4,-1))              ### look left
+            checkXmas(range(y, y-4, -1), range(x, x-4, -1)) ### look up left
 
-for y, row in enumerate(data):
-    for x, c in enumerate(row):
-        if c != "A": continue
-        try:
-            ld = sorted([data[y-1][x-1]] + [data[y+1][x+1]])
-            rd = sorted([data[y-1][x+1]] + [data[y+1][x-1]])
+        if c == "A": 
+            try:
+                ld = sorted([data[y-1][x-1]] + [data[y+1][x+1]])
+                rd = sorted([data[y-1][x+1]] + [data[y+1][x-1]])
 
-            if ld == ["M", "S"] and rd == ["M", "S"]:
-                part2 +=1
-        except:pass
+                if ld == ["M", "S"] and rd == ["M", "S"]:
+                    part2 +=1
+            except:pass
 
 print("Part 1:", part1, "\nPart 2:", part2)
