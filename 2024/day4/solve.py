@@ -1,126 +1,48 @@
 data = []
 
 for line in open('input.txt', 'r').readlines():
-    line = line.strip("\n")
-    line = [x for x in line]
-    line.insert(0, "L")
-    line.append("L")
-    line = "".join(line)
-    data.append([x for x in line])
+    data.append([x for x in line.strip("\n")] + ["L"])
 
-data.insert(0, ["L"*len(data[2])])
-data.insert(0, ["L"*len(data[2])])
+data.append(["L"*len(data[2])])
 
-count = 0
+part1, part2 = 0, 0
 
 def checkXmas(ry, rx):
-    global data, count
+    global data, part1
     try:
-        st = []
-        for ny, nx in zip(ry, rx):
-            st.append(data[ny][nx])
-        if "".join(st) == "XMAS":
-            count +=1
+        st = [data[ny][nx] for ny, nx in zip(ry, rx)]
+        if "".join(st) == "XMAS": part1 +=1
     except: pass
 
 for y, row in enumerate(data):
     for x, c in enumerate(row):
         if c != "X": continue
-        st = []
         ### look up
-        try:
-            st = []
-            for ny in range(y, y-4, -1):
-                st.append(data[ny][x])
-            if "".join(st) == "XMAS":
-                count +=1
-        except: pass
-        checkXmas()
-
+        checkXmas(range(y, y-4, -1), [x]*4)
         ### look diag up right
-        try:
-            st = []
-            for ny, nx in zip(range(y, y-4, -1), range(x, x+4)):
-                st.append(data[ny][nx])
-            if "".join(st) == "XMAS":
-                count += 1
-        except: pass
-
+        checkXmas(range(y, y-4, -1), range(x, x+4))
         ### look right
-        try:
-            st = []
-            for nx in range(x, x+4):
-                st.append(data[y][nx])
-            if "".join(st) == "XMAS":
-                count +=1
-        except: pass
-
+        checkXmas([y]*4, range(x, x+4))
         ### look diag down right
-        try:
-            st = []
-            for ny, nx in zip(range(y, y+4), range(x, x+4)):
-                st.append(data[ny][nx])
-            if "".join(st) == "XMAS":
-                count += 1
-        except: pass
-
+        checkXmas(range(y, y+4), range(x, x+4))
         ### look down
-
-        try:
-            st = []
-            for ny in range(y, y+4):
-                st.append(data[ny][x])
-            if "".join(st) == "XMAS":
-                count +=1
-        except: pass
-
+        checkXmas(range(y, y+4), [x]*4)
         ### look down left
-        try:
-            st = []
-            for ny, nx in zip(range(y, y+4), range(x, x-4, -1)):
-                st.append(data[ny][nx])
-            if "".join(st) == "XMAS":
-                count += 1
-        except: pass
-
+        checkXmas(range(y, y+4), range(x, x-4, -1))
         ### look left
-        try:
-            st = []
-            for nx in range(x, x-4,-1):
-                st.append(data[y][nx])
-            if "".join(st) == "XMAS":
-                count +=1
-        except: pass
-
+        checkXmas([y]*4, range(x, x-4,-1))
         ### look up left
-        try:
-            st = []
-            for ny , nx in zip(range(y, y-4, -1), range(x, x-4, -1)):
-                st.append(data[ny][nx])
-            if "".join(st) == "XMAS":
-                count += 1
-        except: pass
+        checkXmas(range(y, y-4, -1), range(x, x-4, -1))
 
-count2 = 0
 for y, row in enumerate(data):
     for x, c in enumerate(row):
         if c != "A": continue
-
         try:
-            tl = [data[y-1][x-1]]
-            tr = [data[y-1][x+1]]
-            bl = [data[y+1][x-1]]
-            br = [data[y+1][x+1]]
-
-            ld = sorted(tl + br)
-            rd = sorted(tr + bl)
+            ld = sorted([data[y-1][x-1]] + [data[y+1][x+1]])
+            rd = sorted([data[y-1][x+1]] + [data[y+1][x-1]])
 
             if ld == ["M", "S"] and rd == ["M", "S"]:
-                count2 +=1
-
+                part2 +=1
         except:pass
 
-
-
-print(count)
-print(count2)
+print("Part 1:", part1, "\nPart 2:", part2)
