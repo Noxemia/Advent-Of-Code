@@ -1,9 +1,7 @@
-from typing import Tuple, List, Set
+from typing import Tuple, List
 from copy import deepcopy, copy
 
-
-gmap = []
-pos = ()
+gmap, pos = [], ()
 for y, line in enumerate(open('input.txt', 'r').readlines()):
     line = [x for x in line.strip("\n")]
     if "^" in line:
@@ -13,15 +11,18 @@ for y, line in enumerate(open('input.txt', 'r').readlines()):
 savedmap = deepcopy(gmap)
 saved: List[Tuple[int,int,int]] = []
 originalPos = copy(pos)
+
+def getNXNY(x, y, angle):
+    if angle == 0: return (x, y-1)
+    if angle == 1: return (x+1, y)
+    if angle == 2: return (x, y+1)
+    if angle == 3: return (x-1, y)
+
 angle = 0
 while True:
     x, y = pos
-    nx, ny = x, y
-    if angle == 0: nx, ny = x, y-1
-    if angle == 1: nx, ny = x+1, y
-    if angle == 2: nx, ny = x, y+1
-    if angle == 3: nx, ny = x-1, y
-    
+    nx, ny = (g := getNXNY(x, y, angle))[0], g[1]
+
     if ny < 0 or nx < 0 or nx > len(gmap[0])-1 or ny > len(gmap)-1:
         gmap[y][x] = "X"
         break
@@ -40,60 +41,28 @@ for row in gmap:
         if c == "X": count+=1
 
 print(count)
-#print(saved)
+
 placed = set()
-print(len(saved))
-part2 = 0
 def solve2(visited: List[Tuple[int,int,int]], startx:int, starty: int, startangle: int):
-    global part2, originalPos, savedmap, placed
+    global originalPos, savedmap, placed
     newmap = deepcopy(savedmap)
-    visited = []
     pos = (startx, starty)
     x, y = pos
-    nx, ny = 0,0
-    if startangle == 0:
-        nx, ny = x, y-1
-        if nx == originalPos[0] and ny == originalPos[1] and (nx, ny) not in placed:
-            #print("c") 
-            return
-        newmap[ny][nx] = "#"
-    if startangle == 1:
-        nx, ny = x+1, y
-        if nx == originalPos[0] and ny == originalPos[1] and (nx, ny) not in placed:
-            #print("c") 
-            return
-        newmap[ny][nx] = "#"
-    if startangle == 2: 
-        nx, ny = x, y+1
-        if nx == originalPos[0] and ny == originalPos[1] and (nx, ny) not in placed:
-            #print("c") 
-            return
-        newmap[ny][nx] = "#"
-    if startangle == 3:
-        nx, ny = x-1, y 
-        if nx == originalPos[0] and ny == originalPos[1] and (nx, ny) not in placed: 
-            #print("c")
-            #print((nx,ny), originalPos)
-            return
-        newmap[ny][nx] = "#"
+    nx, ny = (g := getNXNY(x, y, startangle))[0], g[1]
+    ### place new stone and save coords for that stone    
+    if  nx == originalPos[0] and ny == originalPos[1] and (nx, ny) not in placed: return
+    newmap[ny][nx] = "#"
     px, py = nx, ny
-    #print("XDDDDD", nx, ny,originalPos[0],  originalPos[1])
-    #if nx == originalPos[0] and ny == originalPos[1]: print("XDDD")
-    #print(pos)
-    pos = copy(originalPos)
+    ### traverse
     angle = 0
+    pos = copy(originalPos)
     while True:
         x, y = pos
         if ((x,y,angle)) in visited:
             placed.add((px, py))
-            part2 += 1
             return
         visited.append((x,y, angle))
-        nx, ny = x, y
-        if angle == 0: nx, ny = x, y-1
-        if angle == 1: nx, ny = x+1, y
-        if angle == 2: nx, ny = x, y+1
-        if angle == 3: nx, ny = x-1, y
+        nx, ny = (g := getNXNY(x, y, angle))[0], g[1]
 
         if ny < 0 or nx < 0 or nx > len(newmap[0])-1 or ny > len(newmap)-1:
             return
@@ -103,9 +72,6 @@ def solve2(visited: List[Tuple[int,int,int]], startx:int, starty: int, startangl
             continue
         pos = nx, ny
 
-glvisited: List[Tuple[int,int,int]] = []
 for i, (x, y, angle) in enumerate(saved):
-    #print(i, part2)
-    solve2(deepcopy(glvisited), x,y,angle)    
-print(part2)
+    solve2([], x,y,angle)    
 print(len(placed))
