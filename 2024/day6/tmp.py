@@ -50,6 +50,8 @@ for row in gmap:
     for c in row:
         if c == "X": count+=1
 
+print(count)
+
 placed = set()
 def solve2(visited: List[Tuple[int,int,int]], startx:int, starty: int, startangle: int):
     global originalPos, savedmap, placed
@@ -59,9 +61,8 @@ def solve2(visited: List[Tuple[int,int,int]], startx:int, starty: int, startangl
     nx, ny = (g := getNXNY(x, y, startangle))[0], g[1]
 
     ### place new stone and save coords for that stone    
-    if not ((nx, ny) == originalPos) : newmap[ny][nx] = "#"
-    if (nx, ny) in placed: return
-
+    if  nx == originalPos[0] and ny == originalPos[1] and (nx, ny) not in placed: return
+    newmap[ny][nx] = "#"
     px, py = nx, ny
     ### traverse
     angle = 0

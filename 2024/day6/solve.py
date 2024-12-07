@@ -39,36 +39,54 @@ for row in gmap:
     for c in row:
         if c == "X": count+=1
 
+print(count)
+#print(saved)
 placed = set()
+print(len(saved))
+part2 = 0
 def solve2(visited: List[Tuple[int,int,int]], startx:int, starty: int, startangle: int):
-    global originalPos, savedmap, placed
+    global part2, originalPos, savedmap, placed
     newmap = deepcopy(savedmap)
     visited = []
     pos = (startx, starty)
     x, y = pos
     nx, ny = 0,0
-
-    ### place new stone and save coords for that stone
     if startangle == 0:
         nx, ny = x, y-1
-        if not (((nx, ny) == originalPos) and (nx, ny) not in placed): newmap[ny][nx] = "#"
+        if nx == originalPos[0] and ny == originalPos[1] and (nx, ny) not in placed:
+            #print("c") 
+            return
+        newmap[ny][nx] = "#"
     if startangle == 1:
         nx, ny = x+1, y
-        if not (((nx, ny) == originalPos) and (nx, ny) not in placed): newmap[ny][nx] = "#"
+        if nx == originalPos[0] and ny == originalPos[1] and (nx, ny) not in placed:
+            #print("c") 
+            return
+        newmap[ny][nx] = "#"
     if startangle == 2: 
         nx, ny = x, y+1
-        if not (((nx, ny) == originalPos) and (nx, ny) not in placed): newmap[ny][nx] = "#"
+        if nx == originalPos[0] and ny == originalPos[1] and (nx, ny) not in placed:
+            #print("c") 
+            return
+        newmap[ny][nx] = "#"
     if startangle == 3:
         nx, ny = x-1, y 
-        if not (((nx, ny) == originalPos) and (nx, ny) not in placed): newmap[ny][nx] = "#"
+        if nx == originalPos[0] and ny == originalPos[1] and (nx, ny) not in placed: 
+            #print("c")
+            #print((nx,ny), originalPos)
+            return
+        newmap[ny][nx] = "#"
     px, py = nx, ny
-
-    ### traverse
+    #print("XDDDDD", nx, ny,originalPos[0],  originalPos[1])
+    #if nx == originalPos[0] and ny == originalPos[1]: print("XDDD")
+    #print(pos)
+    pos = copy(originalPos)
     angle = 0
     while True:
         x, y = pos
         if ((x,y,angle)) in visited:
             placed.add((px, py))
+            part2 += 1
             return
         visited.append((x,y, angle))
         nx, ny = x, y
@@ -89,4 +107,5 @@ glvisited: List[Tuple[int,int,int]] = []
 for i, (x, y, angle) in enumerate(saved):
     #print(i, part2)
     solve2(deepcopy(glvisited), x,y,angle)    
+print(part2)
 print(len(placed))
