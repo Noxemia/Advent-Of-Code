@@ -3,52 +3,50 @@ from enum import Enum
 from copy import copy
 
 class Op(Enum):
-    Add = "+"
-    Mul = "*"
-    Con = "||"
-
+   Add = "+"
+   Mul = "*"
+   Con = "||"
+   
 eqs: List[Tuple[int, List[int]]] = []
-for line in open("input.txt", "r").readlines():
-    line = line.split(":")
-    eqs.append((int(line[0]), [int(x) for x in line[1].split(" ")[1:]]))
 
+for line in open('input.txt', 'r').readlines():
+   line = line.split(":")
+   eqs.append((int(line[0]), [int(x) for x in line[1].split(" ")[1:]]))
+   
 operators = [Op.Add, Op.Mul, Op.Con]
-found = False
-gconUsed = False
+nccfound = False
+ccfound = False
+def recSolve(target: int, cval: int, nums: List[int], listindex:int, coperator: Op, concatUsed: bool):
+    global nccfound, ccfound
+    if ccfound and concatUsed: return
 
-def recSolve(target: int, cval: int, rest: List[int], coperator: Op, conUsed: bool):
-    global found, gconUsed
-    if found: return False
-    if cval > target: return False
-
+    if cval > target: return
+    if len(nums) == listindex:
+        if cval == target:
+            if concatUsed: 
+                ccfound = True
+            else:
+                nccfound = True
+            return
+        return
     # add do current operator
     if coperator == Op.Add:
-        cval += rest.pop(0)
+        cval += nums[listindex]
     elif coperator == Op.Mul:
-        cval *= rest.pop(0)
+        cval *= nums[listindex]
     elif coperator == Op.Con:
-        conUsed = True
-        cval = int(str(cval) + str(rest.pop(0)))
+        concatUsed = True
+        cval = int(str(cval) + str(nums[listindex]))
+    
+    for noperator in operators:
+        if ccfound and concatUsed: return
+        recSolve(target, cval, nums, listindex+1, noperator, concatUsed)
 
-    # Check if list is empty that we reached target
-    if (len(rest)) == 0:
-        if cval == target:
-            if conUsed:
-                gconUsed = True
-            found = True
-            return True
-        return False
-
-    return any(recSolve(target, cval, copy(rest), noperator, conUsed) for noperator in operators)
-
-part1 = 0
-part2 = 0
+part1, part2 = 0, 0
 for eq in eqs:
-    if any(recSolve(eq[0], 0, eq[1], nop, False) for nop in operators):
-        if not gconUsed:
-            part1 += eq[0]
-        part2 += eq[0]
-    found = False
-    gconUsed = False
-
+    for nop in operators[:3]: recSolve(eq[0], 0, eq[1], 0, nop, False)
+    if nccfound: part1  += eq[0]
+    if ccfound: part2   += eq[0]
+    nccfound, ccfound = False, False
+       
 print(part1, part2)
