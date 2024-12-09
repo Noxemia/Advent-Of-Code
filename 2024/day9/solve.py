@@ -3,22 +3,21 @@ dmap = []
 for line in open('input.txt', 'r').readlines():
     dmap = [int(x) for x in line]
 
-dmap2 = dmap
 ### part 1
 rightFileCounter = len(dmap) // 2
 leftfileCounter = 0
 leftBlockCounter = 0
-lp = 0 # 0
+lp = 0
 rp = len(dmap)-1
 writable = False
 cache = []
-p1 = 0
+part1 = 0
 shouldBreak = False
 while True:
     if lp == rp: shouldBreak = True
     if not writable:
         for y in range(dmap[lp]):
-            p1 += leftfileCounter*leftBlockCounter
+            part1 += leftfileCounter*leftBlockCounter
             leftBlockCounter += 1
         writable = not writable
         leftfileCounter +=1
@@ -30,17 +29,15 @@ while True:
             rp -= 2
             rightFileCounter -= 1
         for y in range(dmap[lp]):
-            p1 += cache.pop(0)*leftBlockCounter
+            part1 += cache.pop(0)*leftBlockCounter
             leftBlockCounter += 1
         lp += 1
         writable = not writable
     if shouldBreak: break
 
 for cached in cache:
-    p1 += cached*leftBlockCounter
+    part1 += cached*leftBlockCounter
     leftBlockCounter += 1
-print(p1)
-
 ## p2
 
 ### Check to left of movable file but only once. Build datastructure to allow checking left
@@ -50,21 +47,18 @@ print(p1)
 freespace = []
 blockCounter = 0
 writable = False
-writefileCounter = 0
 for num in dmap:
     if not writable:
         blockCounter += num
         writable = True
-        writefileCounter += 1
     else:
         writable = False
         lb = blockCounter
         rb = blockCounter+num-1
         size = rb-lb+1
         if size == 0: continue
-        freespace.append((size, lb, rb, writefileCounter))
+        freespace.append((size, lb, rb))
         blockCounter+=num
-        writefileCounter +=1
 
 fileindex = len(dmap) // 2
 writable = False
@@ -73,7 +67,7 @@ for numi, num in enumerate(reversed(dmap)):
     if not writable:
         writable = True
         hasMoved = False
-        for index, (size, lb, rb, writefileCounter) in enumerate(freespace):
+        for index, (size, lb, rb) in enumerate(freespace):
             if rb >= blockCounter: break
             if num > size: 
                 continue
@@ -88,7 +82,7 @@ for numi, num in enumerate(reversed(dmap)):
             elif size > num:
                 completed[fileindex] = (lb, lb+num-1)
                 fileindex-=1
-                freespace[index] = ((rb-(lb+num))+1, lb+num, rb, writefileCounter)
+                freespace[index] = ((rb-(lb+num))+1, lb+num, rb)
                 hasMoved = True
                 break 
         if not hasMoved: 
@@ -120,9 +114,4 @@ for k in completed.keys():
     for v in range(lb, rb+1):
         part2 += k*v
 
-for space, _,_,_ in freespace:
-    if space == 0: print("XD")
-
-print(part2)
-
-#print(completed)
+print("Part 1:", part1, "\nPart 2:", part2)
