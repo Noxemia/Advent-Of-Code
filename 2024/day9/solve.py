@@ -1,10 +1,10 @@
-from typing import List, Tuple, Dict
-from copy import copy
+from copy import deepcopy
 dmap = []
 
 for line in open('input.txt', 'r').readlines():
     dmap = [int(x) for x in line]
 
+dmap2 = dmap
 ### part 1
 rightFileCounter = len(dmap) // 2
 leftfileCounter = 0
@@ -14,7 +14,6 @@ rp = len(dmap)-1
 writable = False
 cache = []
 p1 = 0
-inslist = []
 shouldBreak = False
 while True:
     if lp == rp: shouldBreak = True
@@ -22,7 +21,6 @@ while True:
         for y in range(dmap[lp]):
             p1 += leftfileCounter*leftBlockCounter
             leftBlockCounter += 1
-            inslist.append(leftfileCounter)
         writable = not writable
         leftfileCounter +=1
         lp+=1
@@ -33,7 +31,6 @@ while True:
             rp -= 2
             rightFileCounter -= 1
         for y in range(dmap[lp]):
-            inslist.append(cache[0])
             p1 += cache.pop(0)*leftBlockCounter
             leftBlockCounter += 1
         lp += 1
@@ -43,9 +40,92 @@ while True:
 for cached in cache:
     p1 += cached*leftBlockCounter
     leftBlockCounter += 1
-    inslist.append(cached)
 print(p1)
 
-#print("".join([str(x) for x in inslist]))
+## p2
 
-            
+### Check to left of movable file but only once. Build datastructure to allow checking left
+
+
+### list of (startindex, endindex, size)
+freespace = []
+blockCounter = 0
+writable = False
+for num in dmap:
+    if not writable:
+        blockCounter += num
+        writable = True
+    else:
+        writable = False
+        lb = blockCounter
+        rb = blockCounter+num
+        size = rb-lb
+        if size == 0: continue
+        freespace.append((size, lb, rb))
+        blockCounter+=num
+
+fileindex = len(dmap) // 2
+writable = False
+# fileindex: block left index, block right index
+completed = dict()
+
+for num in reversed(dmap):
+    if not writable:
+        writable = True
+        hasMoved = False
+    ### First try move
+        for index, (size, lb, rb) in enumerate(freespace):
+            #print("Consider", "fi",fileindex, "num", num, "lb/rb",lb, rb, "size", size)
+            #print(num < size)
+            if num > size: 
+                continue
+
+            elif size == num:
+                completed[fileindex] = (lb, rb)
+                freespace.pop(index)
+                fileindex-=1
+                hasMoved = True
+                break
+
+            elif size > num:
+                completed[fileindex] = (lb, rb-num)
+                fileindex-=1
+                nlb = lb + num
+                freespace[index] = (rb-nlb, nlb, rb)
+                hasMoved = True
+                break
+        if not hasMoved: 
+            fileindex -= 1          
+    else:
+        writable = False
+
+part2 = 0
+fileindex = 0
+blockindex = 0
+writable = False
+for index, num in enumerate(dmap):
+    if not writable:
+        if fileindex in completed:
+            fileindex += 1
+            print("Not counting file", fileindex)
+            blockindex += num
+            continue
+        for y in range(num):
+            print("For fileindex", fileindex, "Adding", fileindex*blockindex, blockindex)
+            part2 += fileindex*blockindex
+            blockindex += 1
+        writable = not writable
+        fileindex +=1
+    else:
+        writable = not writable
+
+for k in completed.keys():
+    lb, rb = completed[k]
+    for v in range(lb, rb+1):
+        pass
+        part2 += k*v
+
+print("after freespace:", freespace)
+       
+print(completed)
+print(part2)
