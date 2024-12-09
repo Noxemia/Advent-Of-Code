@@ -1,4 +1,3 @@
-from copy import deepcopy
 dmap = []
 
 for line in open('input.txt', 'r').readlines():
@@ -51,81 +50,79 @@ print(p1)
 freespace = []
 blockCounter = 0
 writable = False
+writefileCounter = 0
 for num in dmap:
     if not writable:
         blockCounter += num
         writable = True
+        writefileCounter += 1
     else:
         writable = False
         lb = blockCounter
-        rb = blockCounter+num
-        size = rb-lb
+        rb = blockCounter+num-1
+        size = rb-lb+1
         if size == 0: continue
-        freespace.append((size, lb, rb))
+        freespace.append((size, lb, rb, writefileCounter))
         blockCounter+=num
+        writefileCounter +=1
 
 fileindex = len(dmap) // 2
 writable = False
-# fileindex: block left index, block right index
 completed = dict()
-
-for num in reversed(dmap):
+for numi, num in enumerate(reversed(dmap)):
     if not writable:
         writable = True
         hasMoved = False
-    ### First try move
-        for index, (size, lb, rb) in enumerate(freespace):
-            #print("Consider", "fi",fileindex, "num", num, "lb/rb",lb, rb, "size", size)
-            #print(num < size)
+        for index, (size, lb, rb, writefileCounter) in enumerate(freespace):
+            if rb >= blockCounter: break
             if num > size: 
                 continue
 
             elif size == num:
-                completed[fileindex] = (lb, rb)
+                completed[fileindex] = (lb, lb+num-1)
                 freespace.pop(index)
                 fileindex-=1
                 hasMoved = True
                 break
 
             elif size > num:
-                completed[fileindex] = (lb, rb-num)
+                completed[fileindex] = (lb, lb+num-1)
                 fileindex-=1
-                nlb = lb + num
-                freespace[index] = (rb-nlb, nlb, rb)
+                freespace[index] = ((rb-(lb+num))+1, lb+num, rb, writefileCounter)
                 hasMoved = True
-                break
+                break 
         if not hasMoved: 
             fileindex -= 1          
     else:
         writable = False
-
+    blockCounter -= num
+        
 part2 = 0
 fileindex = 0
 blockindex = 0
 writable = False
 for index, num in enumerate(dmap):
     if not writable:
-        if fileindex in completed:
-            fileindex += 1
-            print("Not counting file", fileindex)
+        if fileindex not in completed:
+            for y in range(num):
+                part2 += fileindex*blockindex
+                blockindex += 1
+        else:
             blockindex += num
-            continue
-        for y in range(num):
-            print("For fileindex", fileindex, "Adding", fileindex*blockindex, blockindex)
-            part2 += fileindex*blockindex
-            blockindex += 1
         writable = not writable
         fileindex +=1
     else:
+        blockindex += num
         writable = not writable
 
 for k in completed.keys():
     lb, rb = completed[k]
     for v in range(lb, rb+1):
-        pass
         part2 += k*v
 
-print("after freespace:", freespace)
-       
-print(completed)
+for space, _,_,_ in freespace:
+    if space == 0: print("XD")
+
 print(part2)
+
+#print(completed)
