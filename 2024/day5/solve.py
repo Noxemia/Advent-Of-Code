@@ -25,13 +25,12 @@ for update in updates:
     if tryOrder(update)[0]: 
         count += update[len(update)//2]
         continue
-    correct, i, y = False, 0, 0
     while True:
         correct, i, y = tryOrder(update)
         if correct: 
             count2 += update[len(update)//2]
             break
-        
+
         update[update.index(y)] = i
         update[update.index(i)] = y
 
