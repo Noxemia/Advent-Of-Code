@@ -30,15 +30,13 @@ def moveRec(visited: List[Tuple[int,int]], score: int, cx:int, cy:int, ce: int) 
             found.add((cx,cy))
             p1 += 1
         p2 +=1
-        return 0
+        return
     visited.append((cx,cy))
     ### get around
     around = getAround(cx,cy, ce)
-    res = 0
     for x,y in around:
         if (x,y) in visited: continue
-        res += moveRec(copy(visited), score, x,y,ce+1)
-    return res
+        moveRec(copy(visited), score, x,y,ce+1)
 
 for x,y in heads:
     moveRec([], 0, x,y,0)
