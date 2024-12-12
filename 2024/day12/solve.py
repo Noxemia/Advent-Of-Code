@@ -5,6 +5,7 @@ for line in open('input.txt', 'r').readlines():
 
 
 walked = set()
+### DFS to find plot coords
 def walkPlot(_x:int, _y:int, letter: str):
     toWalk = [(_x,_y)]
     dirs = [(0, -1), (1, 0), (0, 1), (-1,0)]
@@ -21,73 +22,59 @@ def walkPlot(_x:int, _y:int, letter: str):
                 walked.add((nx, ny))
     return plots
 
-
+### Look around each plot and count coords outside
 def findPerimeter(plots):
     dirs = [(0, -1), (1, 0), (0, 1), (-1,0)]
     count = 0
-    perims = []
     for x, y in plots:
         for (dx, dy) in dirs:
             nx, ny = x+dx, y+dy
             if (nx, ny) not in plots:
-                perims.append((nx, ny))
                 count += 1
-    return (count, perims)
+    return count
 
-
-def walkPerimiter(perims):
-    pwalked = set()
-    dirChanges = 0
-    dirs = [(0, -1), (1, 0), (0, 1), (-1,0)]
+### Count edges, look at above to see if the edge is counted
+def findSides(plots):
+    xmax = max([plot[0] for plot in plots])
+    xmin = min([plot[0] for plot in plots])
+    ymax = max([plot[1] for plot in plots])
+    ymin = min([plot[1] for plot in plots])
     sides = 0
-    #dirs = [(1, -1), (1, 1), (-1, 1), (-1,-1)]
-    for _x, _y in perims:
-        if (_x, _y) in pwalked: continue
-        toWalk = [(_x,_y)]
-        while toWalk:
-            x, y = toWalk.pop()
-            for (dx, dy) in dirs:
-                nx, ny = x+dx, y+dy
-                if (nx, ny) in perims and (nx, ny) not in pwalked: 
-                    toWalk.append((nx, ny))
-                    pwalked.add((nx, ny))
-        sides += 1
-    return sides
-
-
-def walkPerim2(perims: List[Tuple[int,int]]):
-    cdir = 1
-    dirs = [(0, -1), (1, 0), (0, 1), (-1,0)]
-    ndirs = [(-1, -1), (1, -1), (1, 1), (-1,+1)]
-    cx, cy = perims.pop(0)
-    sides = 0
-    while perims:
-        print("Current:", cx, cy)
-        ### Check if we can walk in the current direction
-        dx, dy = dirs[cdir]
-        nx, ny = cx + dx, cy + dy
-        if (nx, ny) in perims:
-            cx, cy = nx, ny
-            perims.remove((cx, cy))
-            continue
-
-        ### If we cant walk further look "right down" to continue path, if not in path break
-        ## sanity check
-        cdir = (cdir +1) % 4
-        print("Change dir to", cdir)
-        dx, dy = ndirs[cdir]
-        nx, ny = cx + dx, cy + dy
-        print(nx, ny)
-        if (nx, ny) not in perims:
-            print("MEGACRINGE")
-            return sides 
-        cx, cy = nx, ny
-        perims.remove((cx, cy))
-        sides +=1
-    return sides
-
- 
+    inedges = set()
+    outedges = set()
     
+    for y in range(ymin, ymax+2):
+        outside = True
+        for x in range(xmin, xmax+2):
+            if (x,y) in plots:
+                if outside:
+                    if (x, y-1) not in inedges:
+                        sides += 1
+                    outside = False
+                    inedges.add((x,y))
+            else:
+                if not outside:
+                    if (x, y-1) not in outedges:
+                        sides +=1
+                    outside = True
+                    outedges.add((x,y))
+        
+    for x in range(xmin, xmax+2):
+        outside = True
+        for y in range(ymin, ymax+2):
+            if (x,y) in plots:
+                if outside:
+                    if (x-1, y) not in inedges:
+                        sides += 1
+                    outside = False
+                    inedges.add((x,y))
+            else:
+                if not outside:
+                    if (x-1, y) not in outedges:
+                        sides +=1
+                    outedges.add((x,y))
+                    outside = True
+    return sides
 
 part1 = 0
 part2 = 0
@@ -95,16 +82,10 @@ for y, row in enumerate(garden):
     for x, c in enumerate(row):
         if (x, y) not in walked:
             plots = walkPlot(x,y, c)
-            #print("Char size", c, len(plots))
-            #print(plots)
             perim = findPerimeter(plots)
-            #print("Perim size", perim)
-            part1 += len(plots)*perim[0]
-            sides = walkPerim2(perim[1])
-            print("Sides:", sides, c)
-            print("Perim blocks", perim[1], c)
-            part2 += len(plots) * sides
-print(part1, part2)
+            sides = findSides(plots)
 
-### to low 768852.0
-###        579813
+            part1 += len(plots) * perim
+            part2 += len(plots) * sides
+
+print(part1, part2)
