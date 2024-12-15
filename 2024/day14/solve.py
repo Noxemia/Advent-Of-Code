@@ -7,11 +7,7 @@ for line in open('input.txt', 'r').readlines():
     px, py = int(p[0]), int(p[1])
     v = line[1].strip("v=").split(",")
     vx, vy = int(v[0]), int(v[1])
-    data.append((px, py, vx, vy))
-    
-for robot in data:
-    break
-    print(*robot)
+    data.append([px, py, vx, vy])
     
 time: int = 100 ### Seconds
 sizex = 101
@@ -19,9 +15,11 @@ sizey = 103
 
 def moveRobot(robot: Tuple[int,int,int,int]):
     px, py, vx, vy = robot
-    for _ in range(time):
-        px = (px + vx) % sizex
-        py = (py + vy) % sizey
+    
+    px = (px + vx) % sizex
+    py = (py + vy) % sizey
+    robot[0] = px
+    robot[1] = py
     ### Quadrants
     # topleft
     if px < sizex // 2 and py < sizey // 2: return 0
@@ -32,17 +30,24 @@ def moveRobot(robot: Tuple[int,int,int,int]):
     ## bottomr right
     if px > sizex // 2 and py > sizey // 2: return 3
 
-#moveRobot((2,4,2,-3))
+part1 = 0
+minsf = float("inf")
+minsfIt = 0
+for i in range(1,sizex*sizey):
+    time = i
+    quadrants = [0,0,0,0]
 
-quadrants = [0,0,0,0]
-for robot in data:
-    res = moveRobot(robot)
-    if res != None:
-        quadrants[res] += 1
-    
-print(quadrants)
+    for robot in data:
+        qi = moveRobot(robot)
+        if qi != None:
+            quadrants[qi] += 1
+    res = 1
+    for num in quadrants:
+        res = res * num
+    if res < minsf: 
+        minsf = res
+        minsfIt = i
+    if i == 100:
+        part1 = res
 
-p1 = 1
-for num in quadrants:
-    p1 = p1 * num
-print(p1)
+print(part1, minsfIt, minsf)
