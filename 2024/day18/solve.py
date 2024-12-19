@@ -40,29 +40,25 @@ def tryWalk():
                 cost_so_far[(nx, ny)] = c+1
                 heapq.heappush(toWalk, (c+1, nx, ny, copy(lv)))
 print(tryWalk())
-
-
-def addStonesTo(to: int):
+    
+def updateStones(to, c, inc):
     global fallen
-    for i in range(fallen, to+1):
+    for i in range(fallen, to+inc, inc):
         x, y = data[i]
-        memmap[y][x] = "#"
+        memmap[y][x] = c
     fallen = to
         
-def removeStonesTo(to: int):
-    global fallen
-    for i in range(fallen, to-1, -1):
-        x, y = data[i]
-        memmap[y][x] = "."
-    fallen = to
+for inc in [1000, 500, 100, 50, 10]:
+    while tryWalk() != None:
+        updateStones(fallen+inc, "#", 1)
+    updateStones(fallen-inc, ".", -1)
 
-while tryWalk() != None:
-    addStonesTo(fallen+100)
-    
-removeStonesTo(fallen-100)
 for i in range(fallen, fallen+100):
         x, y = data[i]
         memmap[y][x] = "#"
         if tryWalk() == None:
             print(x,y)
             break
+        
+## 0.13
+## 0.05
