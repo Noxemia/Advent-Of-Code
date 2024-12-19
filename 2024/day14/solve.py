@@ -13,7 +13,10 @@ time: int = 100 ### Seconds
 sizex = 101
 sizey = 103
 
+midx = sizex // 2
+midy = sizey // 2
 def moveRobot(robot: Tuple[int,int,int,int]):
+    global midx, midy
     px, py, vx, vy = robot
     
     px = (px + vx) % sizex
@@ -22,19 +25,18 @@ def moveRobot(robot: Tuple[int,int,int,int]):
     robot[1] = py
     ### Quadrants
     # topleft
-    if px < sizex // 2 and py < sizey // 2: return 0
+    if px < midx and py < midy: return 0
     # top right
-    if px > sizex // 2 and py < sizey // 2: return 1
+    elif px > midx and py < midy: return 1
     ## bottom left
-    if px < sizex // 2 and py > sizey // 2: return 2
+    elif px < midx and py > midy: return 2
     ## bottomr right
-    if px > sizex // 2 and py > sizey // 2: return 3
+    elif px > midx and py > midy: return 3
 
 part1 = 0
 minsf = float("inf")
 minsfIt = 0
 for i in range(1,sizex*sizey):
-    time = i
     quadrants = [0,0,0,0]
 
     for robot in data:
@@ -50,4 +52,4 @@ for i in range(1,sizex*sizey):
     if i == 100:
         part1 = res
 
-print(part1, minsfIt, minsf)
+print(part1, minsfIt)
