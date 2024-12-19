@@ -32,7 +32,9 @@ while nodes:
         if ccost > part1: break
     
     for di in [(cdir-1)%4, (cdir+1)%4]:
-        if (cx, cy, di) in visited: continue
+        dx, dy = directions[di]
+        nx, ny = cx+dx, cy+dy
+        if (cx, cy, di) in visited or data[ny][nx] != ".": continue
         heapq.heappush(nodes, (ccost+1000, cx, cy, di, copy(lv)))
     dx, dy = directions[cdir]
     nx, ny = cx+dx, cy+dy

@@ -1,12 +1,12 @@
-import math
 from copy import copy
 instructions = []
 out = []
+part1input = 0
 
 for line in open('input.txt', 'r').readlines():
     if line == "\n": continue
-    if line[0] == 'R':
-        pass
+    elif "A:" in line:
+        part1input = int(line.split(":")[1])
     else:
         line = line.split(":")[1]
         instructions = [int(x) for x in line.split(",")]
@@ -19,8 +19,9 @@ def getCombo(op: int, rega, regb, regc):
     elif op == 4: return copy(rega)
     elif op == 5: return copy(regb)
     elif op == 6: return copy(regc)
-    elif op == 7: print("NOT ALLOWED")
-    print("Wtf")
+    elif op == 7: 
+        print("NOT ALLOWED")
+        exit(0)
 
 def tryAVal(val: int):
     global instructions
@@ -30,7 +31,6 @@ def tryAVal(val: int):
     regc = 0
     out = []
     while ip <= len(instructions)-1:
-        inc = True
         instr = instructions[ip]
         op = instructions[ip+1]
         cop = getCombo(op, rega, regb, regc)
@@ -45,9 +45,7 @@ def tryAVal(val: int):
             regb = cop % 8
             
         elif instr == 3:
-            if rega != 0:
-                ip = op
-                inc = False
+            if rega != 0: ip = op-2
                 
         elif instr == 4: 
             regb = regb ^ regc
@@ -61,14 +59,15 @@ def tryAVal(val: int):
         elif instr == 7: 
             regc = rega // 2**cop
             
-        if inc: ip+=2
+        ip+=2
     part1 = ""
     for n in out:
         part1 += f"{n},"
     part1 = part1[:-1]
     print(part1)
     
-tryAVal(33024962)
+tryAVal(part1input)
+
 def findByte(result, instructions):
     if len(instructions) == 0: return result
     comp = instructions[-1]
