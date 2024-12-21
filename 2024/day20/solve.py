@@ -1,7 +1,7 @@
+from collections import defaultdict
 course = []
 start = 0
 end = 0
-
 
 for y, line in enumerate(open('input.txt', 'r').readlines()):
     line = [x for x in line.strip("\n")]
@@ -28,24 +28,41 @@ while toWalk:
         toWalk = (nx, ny, dist+1)
         break
 
-mincheat = 20
-from collections import defaultdict
-cheats = defaultdict(int)
+
+cheats2 = defaultdict(int)
+cheats1 = defaultdict(int)
+
 for x, y in nodes:
+    coordsToCheck = set()
+    
+    for yi in range(-20, 21):
+        _y = y + yi      
+        for _x in range(x-20+abs(yi), x+21-abs(yi)):
+            if (_x, _y) in nodes:
+                dist = abs(x-_x) + abs(y-_y)
+                coordsToCheck.add((_x,_y, dist))
+                
     owalked = nodes[(x,y)]
-    for dx, dy in ((0, -2), (2, 0), (0,2), (-2,0)):
-        nx, ny = x+dx, y+dy
+    for nx, ny, dist in coordsToCheck:            
         if (nx, ny) not in nodes: continue
         nwalked = nodes[(nx, ny)]
         if owalked <= nwalked: continue
-        cheatdist = abs((nwalked - owalked) +2)
-        if cheatdist == 0: continue
-        cheats[cheatdist] = cheats[cheatdist]+1
-        
+        cheatdist = abs((nwalked - owalked) + dist)
+        if cheatdist < 100: continue
+        cheats2[cheatdist] = cheats2[cheatdist]+1
+        if dist == 2:
+            cheats1[cheatdist] = cheats1[cheatdist]+1
+
 p1 = 0      
-for dist in cheats.keys():
+for dist in cheats1.keys():
     if dist >= 100:
-        p1 += cheats[dist]
+        p1 += cheats1[dist]
+                
+p2 = 0      
+for dist in cheats2.keys():
+    if dist >= 100:
+        p2 += cheats2[dist]
+        
 
+print(p1, p2)
 
-print(p1)
