@@ -17,8 +17,8 @@ for groupi in pointers:
         for comp2 in group:
             if comp2 in group2:
                 content = sorted([groupi, comp, comp2])
-                tucnt = (content[0], content[1], content[2])
-                threeGroups.add(tucnt)
+                threeGroup = (content[0], content[1], content[2])
+                threeGroups.add(threeGroup)
         
 p1 = 0
 for (f,s,t) in threeGroups:
@@ -33,29 +33,24 @@ for (f,s,t) in threeGroups:
         continue
     
 print(p1)
-print(pointers)
-p2 = 4
 
-allsets = set()
+largestSet = []
+seen = set()
+def search(current_node, group):
+    global largestSet
+    if current_node in seen: return
+    seen.add(current_node)
+    if len(group) > len(largestSet): largestSet = group
+    
+    forwardGroup = pointers[current_node]
 
-def search(cnode, group):
-    cgroup = pointers[cnode]
-    
-    l = ""
-    for n in sorted(list(group)):
-        l+=n + ","
-    l = l[:-1]
-    if l in allsets: return
-    allsets.add(l)
-    
-    for node in cgroup:
-        if node in group: continue
-        if all([n in pointers[node] for n in group]):
-            search(node, group | {node})
+    for connectedNode in forwardGroup:
+        if connectedNode in group: continue
+        if all([node in pointers[connectedNode] for node in group]):
+            search(connectedNode, group | {connectedNode})
             
 for node in pointers.keys():
     search(node, {node})
 
-allsets = list(allsets)
-allsets = sorted(allsets, key=lambda x: len(x), reverse=True)
-print(allsets[0])
+largestSet = list(largestSet)
+print("".join([x+"," for x in sorted(largestSet)])[:-1])
