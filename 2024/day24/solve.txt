@@ -1,0 +1,23 @@
+z00 = y00 XOR x00
+####
+z01 = bdk xor rsq
+
+bdk = x00 and y00
+rsq = y01 XOR x01
+####
+z02 = spt XOR vjn
+
+vjn = y02 XOR x02
+
+spt = jnh OR qkj
+jhn = rsq and bdk # old ok
+qjk = x01 AND y01 # old ok
+### 
+z03 = mtq XOR tkj
+
+mtq = y03 XOR x03
+
+tkj = GMS or cpf
+gms = spt and vjn # old ok
+cpf = y02 and x02 # old ok
+

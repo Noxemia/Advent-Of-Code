@@ -69,5 +69,3 @@ for seq in allKeys:
         part2seq = seq
     tmpsum = 0
 print(p1sum, part2, part2seq)
-
-# 14409 to high
